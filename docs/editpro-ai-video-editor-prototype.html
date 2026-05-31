@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EditPro AI Video Editor Prototype</title>
+  <style>
+    :root {
+      --bg: #070817;
+      --panel: rgba(255, 255, 255, 0.08);
+      --panel-strong: rgba(255, 255, 255, 0.14);
+      --text: #f7f7ff;
+      --muted: #aeb2d8;
+      --primary: #7c3cff;
+      --primary-2: #00d4ff;
+      --accent: #ff4ecd;
+      --success: #2ff3a6;
+      --warning: #ffd166;
+      --danger: #ff5d73;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(124, 60, 255, 0.32), transparent 30%),
+        radial-gradient(circle at 88% 14%, rgba(0, 212, 255, 0.22), transparent 28%),
+        radial-gradient(circle at 50% 88%, rgba(255, 78, 205, 0.18), transparent 34%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 40px;
+      align-items: center;
+      min-height: 90vh;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--muted);
+      font-size: 14px;
+      backdrop-filter: blur(18px);
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 0 8px rgba(47, 243, 166, 0.12);
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 28px 0 18px;
+      font-size: clamp(42px, 8vw, 82px);
+      line-height: 0.92;
+      letter-spacing: -0.07em;
+    }
+
+    h1 span {
+      background: linear-gradient(110deg, var(--primary-2), var(--accent), var(--warning));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      max-width: 670px;
+      margin: 0 0 30px;
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1.7;
+    }
+
+    .actions,
+    .chips,
+    .toolbar,
+    .tool-grid,
+    .export-options,
+    .timeline-head,
+    .clip-row,
+    .phone-top,
+    .stats {
+      display: flex;
+      align-items: center;
+    }
+
+    .actions {
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .button {
+      border: 0;
+      border-radius: 18px;
+      padding: 15px 20px;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 16px 38px rgba(124, 60, 255, 0.28);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.09);
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .button:hover,
+    .tool:hover,
+    .clip:hover {
+      transform: translateY(-2px);
+    }
+
+    .chips {
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 10px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-size: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .phone-shell {
+      position: relative;
+      width: min(100%, 390px);
+      margin-left: auto;
+      padding: 12px;
+      border-radius: 42px;
+      background: linear-gradient(150deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.04));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .phone {
+      min-height: 780px;
+      border-radius: 32px;
+      overflow: hidden;
+      background: #0d1027;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .phone-top {
+      justify-content: space-between;
+      padding: 18px 18px 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .notch {
+      width: 92px;
+      height: 25px;
+      border-radius: 999px;
+      background: #050611;
+      margin: 0 auto;
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px 18px;
+    }
+
+    .brand {
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .premium {
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(255, 209, 102, 0.14);
+      color: var(--warning);
+    }
+
+    .preview {
+      position: relative;
+      height: 310px;
+      margin: 0 18px;
+      border-radius: 26px;
+      overflow: hidden;
+      background:
+        linear-gradient(140deg, rgba(0, 212, 255, 0.34), transparent 40%),
+        linear-gradient(30deg, rgba(255, 78, 205, 0.36), transparent 45%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23101833'/%3E%3Ccircle cx='120' cy='120' r='90' fill='%237c3cff' opacity='.58'/%3E%3Ccircle cx='360' cy='180' r='115' fill='%2300d4ff' opacity='.42'/%3E%3Cpath d='M0 385 C140 310 230 450 500 330 L500 500 L0 500 Z' fill='%23ff4ecd' opacity='.45'/%3E%3Cpath d='M0 430 C160 350 250 490 500 390 L500 500 L0 500 Z' fill='%23ffd166' opacity='.34'/%3E%3C/svg%3E") center/cover;
+      box-shadow: inset 0 -80px 100px rgba(0, 0, 0, 0.48);
+    }
+
+    .play {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .play span {
+      width: 72px;
+      height: 72px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(18px);
+      font-size: 30px;
+    }
+
+    .caption-card {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 18px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(16px);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .toolbar {
+      gap: 9px;
+      overflow-x: auto;
+      padding: 18px;
+    }
+
+    .tool {
+      min-width: 72px;
+      padding: 12px 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+      transition: transform 180ms ease;
+    }
+
+    .tool strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    .timeline {
+      margin: 0 18px 18px;
+      padding: 14px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .timeline-head {
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .clip-row {
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .label {
+      width: 44px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .clip {
+      height: 38px;
+      border-radius: 10px;
+      transition: transform 180ms ease;
+    }
+
+    .video-1 {
+      width: 112px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+
+    .video-2 {
+      width: 76px;
+      background: linear-gradient(90deg, var(--primary-2), var(--success));
+    }
+
+    .audio {
+      width: 210px;
+      background: repeating-linear-gradient(90deg, rgba(47, 243, 166, 0.9) 0 8px, rgba(47, 243, 166, 0.25) 8px 14px);
+    }
+
+    .text-track {
+      width: 160px;
+      background: linear-gradient(90deg, var(--warning), var(--accent));
+    }
+
+    .sections {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .card {
+      padding: 22px;
+      border-radius: 26px;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 12px;
+      letter-spacing: -0.03em;
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .tool-grid {
+      align-items: stretch;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .feature-tile {
+      min-height: 120px;
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .feature-tile b {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .export-options {
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .export-options span {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--muted);
+    }
+
+    .stats {
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .stat {
+      flex: 1 1 150px;
+      padding: 18px;
+      border-radius: 20px;
+      background: var(--panel-strong);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      margin: 16px 18px 20px;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .sections {
+        grid-template-columns: 1fr;
+      }
+
+      .phone-shell {
+        margin: 0 auto;
+      }
+
+      .tool-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: min(100% - 20px, 1180px);
+        padding-top: 18px;
+      }
+
+      .phone {
+        min-height: 720px;
+      }
+
+      .preview {
+        height: 260px;
+      }
+
+      .tool-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> Direct app preview file · Open in browser</div>
+        <h1 id="hero-title">EditPro <span>AI Video Editor</span></h1>
+        <p class="lead">
+          A polished mobile-app prototype showing how the video editor can look: AI captions,
+          multi-layer timeline, music, effects, export settings, and premium tools in one simple interface.
+        </p>
+        <div class="actions">
+          <button class="button" onclick="document.querySelector('.phone-shell').scrollIntoView({behavior: 'smooth'})">View App Screen</button>
+          <button class="button secondary" onclick="document.querySelector('#features').scrollIntoView({behavior: 'smooth'})">See Features</button>
+        </div>
+        <div class="chips" aria-label="Supported workflows">
+          <span class="chip">9:16 Reels</span>
+          <span class="chip">4K Export</span>
+          <span class="chip">AI Captions</span>
+          <span class="chip">Background Removal</span>
+          <span class="chip">Music Sync</span>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>60 FPS</strong><span>Smooth export</span></div>
+          <div class="stat"><strong>4K</strong><span>Premium quality</span></div>
+          <div class="stat"><strong>AI</strong><span>Auto editing tools</span></div>
+        </div>
+      </div>
+
+      <aside class="phone-shell" aria-label="Mobile app editor preview">
+        <div class="phone">
+          <div class="phone-top">
+            <span>9:41</span>
+            <div class="notch" aria-hidden="true"></div>
+            <span>100%</span>
+          </div>
+          <div class="app-header">
+            <div>
+              <div class="brand">EditPro AI</div>
+              <small style="color: var(--muted)">Wedding Reel · Auto saved</small>
+            </div>
+            <span class="premium">PRO</span>
+          </div>
+          <div class="preview">
+            <div class="play"><span>▶</span></div>
+            <div class="caption-card">AI Caption: “Create cinematic reels in minutes”</div>
+          </div>
+          <div class="toolbar" aria-label="Editor toolbar">
+            <div class="tool"><strong>✂</strong>Trim</div>
+            <div class="tool"><strong>⚡</strong>Speed</div>
+            <div class="tool"><strong>🎵</strong>Music</div>
+            <div class="tool"><strong>✨</strong>Effects</div>
+            <div class="tool"><strong>🧠</strong>AI</div>
+          </div>
+          <div class="timeline">
+            <div class="timeline-head"><span>00:00</span><b>Multi-layer timeline</b><span>00:30</span></div>
+            <div class="clip-row"><span class="label">Video</span><div class="clip video-1"></div><div class="clip video-2"></div></div>
+            <div class="clip-row"><span class="label">Audio</span><div class="clip audio"></div></div>
+            <div class="clip-row"><span class="label">Text</span><div class="clip text-track"></div></div>
+          </div>
+          <div class="bottom-nav">
+            <span>Home</span>
+            <span>Templates</span>
+            <span>Editor</span>
+            <span>Export</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="sections" id="features" aria-label="Feature details">
+      <article class="card">
+        <h2>Editing Tools</h2>
+        <ul>
+          <li>Trim, split, merge, crop, rotate, flip, and speed controls.</li>
+          <li>Frame-accurate timeline with snap alignment and zoom.</li>
+          <li>Social ratios for Shorts, Reels, square posts, and widescreen videos.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Audio Studio</h2>
+        <ul>
+          <li>Background music, voice recording, audio extraction, and looping.</li>
+          <li>Fade in, fade out, noise reduction, and volume controls.</li>
+          <li>Support for MP3, WAV, and AAC workflows.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>AI Automation</h2>
+        <ul>
+          <li>Auto captions with styling and synchronization.</li>
+          <li>AI background removal and cinematic color grading.</li>
+          <li>Thumbnail and reel generation from photos and music.</li>
+        </ul>
+      </article>
+
+      <article class="card wide">
+        <h2>Professional Feature Map</h2>
+        <div class="tool-grid">
+          <div class="feature-tile"><b>Authentication</b><span>Email, phone, Google, Apple, guest mode, OTP, and 2FA.</span></div>
+          <div class="feature-tile"><b>Projects</b><span>Auto save, duplicate, delete, cloud backup, and recovery.</span></div>
+          <div class="feature-tile"><b>Creative Assets</b><span>Fonts, animated text, stickers, emojis, GIFs, filters, and transitions.</span></div>
+          <div class="feature-tile"><b>Cloud</b><span>Firebase Storage, synchronization, multi-device access, and restore.</span></div>
+        </div>
+      </article>
+
+      <article class="card wide">
+        <h2>Export & Sharing</h2>
+        <p>Render videos for social media and professional delivery with flexible quality controls.</p>
+        <div class="export-options" aria-label="Export options">
+          <span>480p</span>
+          <span>720p</span>
+          <span>1080p</span>
+          <span>1440p</span>
+          <span>4K Ultra HD</span>
+          <span>24 / 30 / 60 FPS</span>
+          <span>Instagram</span>
+          <span>YouTube</span>
+          <span>WhatsApp</span>
+          <span>Facebook</span>
+          <span>Telegram</span>
+          <span>X</span>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

@@ -6,6 +6,10 @@ EditPro AI Video Editor is a modern, powerful, and user-friendly mobile video ed
 
 The core vision is to provide an all-in-one mobile editing platform focused on speed, simplicity, creativity, AI-powered automation, high-quality export, and social-media-ready output.
 
+## Direct App Preview File
+
+To see the app UI directly, open `docs/editpro-ai-video-editor-prototype.html` in any modern browser. It is a standalone prototype file with no build step, backend, or dependency installation required.
+
 ## Problem Statement
 
 Demand for short-form and promotional video content continues to grow across platforms such as Instagram Reels, YouTube Shorts, Facebook Videos, WhatsApp, Telegram, and X. Many users struggle with traditional professional video editing tools because they are complex, expensive, or optimized for desktop workflows.
